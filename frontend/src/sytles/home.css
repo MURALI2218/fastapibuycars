@@ -1,0 +1,336 @@
+/* ==========================
+   CAR FILTER SECTION
+========================== */
+
+.car-filter-section {
+    background: #ffffff;
+    padding: 0 50px 24px;
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* TOP */
+
+.filter-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1000px;
+    margin: 10px auto 0px;
+}
+
+.filter-top h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #111;
+}
+
+.city-selector {
+    border: none;
+    background: transparent;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    color: #444;
+
+    cursor: pointer;
+
+    border-bottom: 1px dashed #777;
+
+    padding-bottom: 4px;
+}
+
+.city-selector i {
+    margin-left: 8px;
+}
+
+
+/* SEARCH BOX */
+
+.car-search-box {
+    max-width: 1000px;
+    height: 50px;
+
+    margin: 0 auto;
+
+    border: 1px solid #444;
+
+    border-radius: 30px;
+
+    display: flex;
+    align-items: center;
+    
+    padding: 4px;
+  
+    box-sizing: border-box;
+}
+.search-section{
+    display: flex;
+    flex-direction: column;
+}
+
+/* NEW / USED */
+
+.condition-buttons {
+    display: flex;
+
+    height: 46px;
+
+    background: #eaf7f6;
+
+    border-radius: 25px;
+
+    overflow: hidden;
+}
+
+.condition-buttons button {
+    border: none;
+
+    background: transparent;
+
+    padding: 0 18px;
+
+    font-size: 15px;
+
+    color: #555;
+
+    cursor: pointer;
+}
+
+.condition-buttons .condition-active {
+    background: #008f83;
+
+    color: white;
+
+    border-radius: 25px;
+}
+
+
+/* SEARCH INPUT */
+
+.car-search-box input {
+    flex: 1;
+
+    border: none;
+
+    outline: none;
+    height: 35px;
+    padding: 0 18px;
+
+    font-size: 16px;
+    width: 350px;
+    color: #444;
+
+    background: transparent;
+}
+
+.car-search-box input::placeholder {
+    color: #777;
+}
+
+.search-icon {
+    font-size: 23px;
+
+    margin-right: 15px;
+
+    color: #444;
+}
+
+
+/* FILTER BUTTONS */
+
+.filter-buttons {
+    max-width: 1000px;
+
+    margin: 22px auto 0;
+
+    display: flex;
+
+    gap: 9px;
+
+    flex-wrap: wrap;
+}
+
+
+.filter-wrapper {
+    position: relative;
+}
+
+
+.filter-button {
+    height: 43px;
+
+    background: white;
+
+    border: 1px solid #d2d2d2;
+
+    border-radius: 8px;
+
+    padding: 0 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 15px;
+
+    color: #444;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.filter-button:hover,
+.filter-active {
+    border-color: #008f83;
+
+    background: #f0faf9;
+}
+
+
+.filter-button i {
+    color: #008f83;
+
+    font-size: 17px;
+}
+
+
+/* DROPDOWN */
+
+.filter-dropdown {
+    position: absolute;
+
+    top: 50px;
+    left: 0;
+
+    width: 190px;
+
+    background: white;
+
+    border-radius: 10px;
+
+    border: 1px solid #ddd;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+    padding: 8px;
+
+    z-index: 1000;
+}
+
+
+.filter-dropdown button {
+    width: 100%;
+
+    border: none;
+
+    background: white;
+
+    text-align: left;
+
+    padding: 10px 12px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+
+.filter-dropdown button:hover {
+    background: #eaf7f6;
+
+    color: #008f83;
+}
+
+
+/* ALL FILTERS */
+
+.all-filters-panel {
+    max-width: 1000px;
+
+    margin: 15px auto 0;
+
+    padding: 20px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 12px;
+
+    background: #fafafa;
+
+    display: flex;
+
+    align-items: end;
+
+    gap: 20px;
+
+    flex-wrap: wrap;
+}
+
+
+.all-filter-item {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.all-filter-item label {
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #555;
+}
+
+
+.all-filter-item select {
+    min-width: 160px;
+
+    padding: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    background: white;
+
+    outline: none;
+}
+
+
+.clear-filter {
+    padding: 10px 16px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #008f83;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+
+/* CAR COUNT */
+
+.car-count {
+    font-size: 14px;
+
+    color: #777;
+
+    font-weight: normal;
+
+    margin-left: 10px;
+}

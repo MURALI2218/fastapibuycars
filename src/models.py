@@ -59,6 +59,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     email_id = Column(String, nullable=False)
     username = Column(String, nullable=False)
+    contact_number = Column(String,nullable=True, default=None)
     password = Column(String, nullable=False)
 
     cars = relationship("Car", back_populates="owner")
@@ -68,12 +69,13 @@ class User(Base):
 class Car(Base):
     __tablename__ = "cars"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     model = Column(String, nullable=False)
     colour = Column(String, nullable=False)
     year = Column(Integer, nullable=False)
     price = Column(Numeric(12, 2), nullable=False)
     carlocation = Column(String, nullable=False)
+    
 
     owner_id = Column( Integer, ForeignKey("users.id"),nullable=False)
     brand_id = Column(Integer,ForeignKey("brands.id"),nullable=False)
@@ -88,3 +90,22 @@ class Car(Base):
     fueltype = relationship("FuelType", back_populates="cars")
     geartype = relationship("GearType", back_populates="cars")
     post_status = relationship("PostStatus", back_populates="cars")
+
+    booking = relationship("carbooking", back_populates="cardetail")
+
+# -------------------------
+# Car BOOKING MODEL
+# -------------------------
+
+class carbooking(Base):
+    __tablename__ = "bookings"
+
+    bookingid = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String, nullable=False)
+    contact_number = Column(String, nullable=False)
+    emailid = Column(String, nullable=False)
+    booking_userid = Column(Integer,nullable=False)
+    car_id =  Column(Integer, ForeignKey("cars.id"), nullable=False)
+    # Relationships
+    cardetail = relationship("Car", back_populates="booking")
+
