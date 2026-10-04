@@ -110,3 +110,11 @@ class bookingOut(BaseModel):
     bookinguserid : UserDetailsOut
     
     model_config = ConfigDict(from_attributes=True)
+
+
+class RAGRequest(BaseModel):
+    query: str
+
+
+class RAGResponse(BaseModel):
+    answer: str

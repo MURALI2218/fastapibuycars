@@ -13,13 +13,13 @@
 /* Floating Chat Button */
 
 .chatbot-button {
-    width: 62px;
-    height: 62px;
+    width: 60px;
+    height: 60px;;
 
     border: none;
     border-radius: 50%;
 
-    background: #2563eb;
+    background: none;
     color: white;
 
     font-size: 26px;
@@ -38,7 +38,7 @@
 
 .chatbot-button:hover {
     transform: scale(1.08);
-    background: #1d4ed8;
+    background: none;
 }
 
 
@@ -90,7 +90,7 @@
 
 .chatbot-header span {
     font-size: 12px;
-    color: #dbeafe;
+    color: #00ff21;
 }
 
 
@@ -139,7 +139,7 @@
 /* Input */
 
 .chatbot-input {
-    display: flex;
+   
 
     padding: 12px;
 
@@ -170,10 +170,11 @@
 
 
 .chatbot-input button {
-    width: 42px;
-    height: 42px;
+    width: 37px;
+    height: 37px;
 
-    margin-left: 8px;
+    
+    margin-left: 10px;
 
     border: none;
 
@@ -185,4 +186,85 @@
     cursor: pointer;
 
     font-size: 16px;
+}
+.chatbot-messages {
+    flex: 1;
+    padding: 18px;
+    overflow-y: auto;
+    background: #f8fafc;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+/* BOT MESSAGE */
+
+.bot-message {
+    align-self: flex-start;
+
+    background: white;
+
+    padding: 11px 14px;
+
+    border-radius: 5px 15px 15px 15px;
+
+    max-width: 80%;
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    color: #333;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+
+/* USER MESSAGE */
+
+.user-message {
+    align-self: flex-end;
+
+    background: #008f83;
+
+    color: white;
+
+    padding: 11px 14px;
+
+    border-radius: 15px 5px 15px 15px;
+
+    max-width: 80%;
+
+    font-size: 14px;
+    line-height: 1.5;
+
+    word-break: break-word;
+}
+
+
+/* THINKING */
+
+.typing-message {
+    font-style: italic;
+    color: #777;
+}
+
+.chatboticon{
+    height: 50px;
+    width: 50px;
+}
+.input-group {
+  display: flex;
+  width: 100%; /* Or set a specific container width, e.g., 500px */
+}
+
+.input-group input {
+  flex: 0 0 80%;
+  box-sizing: border-box;
+}
+
+.input-group button {
+  flex: 0 0 20%;
+  box-sizing: border-box;
 }
