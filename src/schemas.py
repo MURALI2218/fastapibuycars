@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, ClassVar
+from typing import Optional,Literal
 
 from pydantic import BaseModel,ConfigDict
 
@@ -27,8 +27,8 @@ class CarDetailsOut(BaseModel):
     year: int
     price: Decimal
     carlocation: str
-
-    owner_id: UserDetailsOut
+    
+    owner: UserDetailsOut
     brand: BrandOut
     fueltype: FuelTypeOut
     geartype: GearTypeOut
@@ -106,8 +106,8 @@ class bookingOut(BaseModel):
     name :str
     contact_number : str
     email_id:str
-    carid : CarDetailsOut
-    bookinguserid : UserDetailsOut
+    car : CarDetailsOut
+    bookinguser : UserDetailsOut
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -118,3 +118,36 @@ class RAGRequest(BaseModel):
 
 class RAGResponse(BaseModel):
     answer: str
+
+
+class QueryIntent(BaseModel):
+    intent: Literal["car_search", "knowledge"]
+
+class CarSearchFilters(BaseModel):
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    colour: Optional[str] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
+    fueltype: Optional[str] = None
+    geartype: Optional[str] = None
+    location: Optional[str] = None
+    min_year: Optional[int] = None
+    max_year: Optional[int] = None
+
+class CarResponsellm(BaseModel):
+    id: int
+    brand: str
+    model: str
+    colour: str
+    year: int
+    price: float
+    carlocation: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+class CarSearchResponse(BaseModel):
+    message: str
+    filters: CarResponsellm
+    count: int
+    cars: list[CarSearchFilters]

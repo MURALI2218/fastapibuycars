@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from ..database import get_db
 from sqlalchemy.orm import Session
 from .. import schemas, models, auth2
+from typing import List
 
 router = APIRouter( tags=['Cars'])
 
@@ -170,21 +171,34 @@ def bookcars(bookingdetial : schemas.booking_form_input, db : Session =Depends(g
          
     return { "message": " CAR has been successfully booked",  "car booking id": f"{careatedbookingid.bookingid}"}
          
-@router.get("/api/carbooking/", response_model=schemas.bookingOut)
-def bookcars(db : Session =Depends(get_db), current_user : dict = Depends(auth2.get_current_user)):
-    userbookingdetails =  db.query(models.carbooking).filter(
-        models.carbooking.booking_userid == current_user.id)
-    results =[]
-    for booking in userbookingdetails:
+@router.get("/api/carbooking/",response_model=List[schemas.bookingOut])
+def bookcars(db: Session = Depends(get_db),current_user: dict = Depends(auth2.get_current_user)):
+
+    bookings = db.query(models.carbooking).filter(
+        models.carbooking.booking_userid == current_user.id
+    ).all()
+
+    results = []
+
+    for booking in bookings:
+
+        car = db.query(models.Car).filter(
+            models.Car.id == booking.car_id
+        ).first()
+
+        user = db.query(models.User).filter(
+            models.User.id == booking.booking_userid
+        ).first()
+
         results.append({
-            "name" : booking.name,
-            "contact_number" : booking.contact_number,
-            "email_id": booking.emailid
-            
-                
-            
+            "name": booking.name,
+            "contact_number": booking.contact_number,
+            "email_id": booking.emailid,
+            "car": car,
+            "bookinguser": user
         })
-        return results
+
+    return results
     
 
 

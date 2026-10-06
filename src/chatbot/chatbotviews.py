@@ -5,10 +5,11 @@ from pathlib import Path
 import datetime
 import os
 from openai import OpenAI
+from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 load_dotenv()
 from fastapi import APIRouter, Depends
-from .. import schemas, config, auth2
+from .. import schemas, config, auth2, database, models
 router = APIRouter( tags=['Cars'])
 
 def process_allpdffiles(pdf_directory):
@@ -102,7 +103,7 @@ embedding_model = EmbeddingModel()
 embedding_model
 
 class VectorStore():
-    def __init__(self, collection_name: str = "pdfdocuments" , persist_directory: str = "../data/vector_store"):
+    def __init__(self, collection_name: str = "pdfdocuments" , persist_directory: str = "./data/vector_store"):
         self.collection_name=  collection_name
         self.persist_directory = persist_directory
         self.client = None
@@ -252,21 +253,179 @@ def RAG_simple(query, retriever, client, top_k=3):
     
     return response.output_text
 
+def filtercars(query,client):
+    
+        response = client.responses.parse(
+            model="gpt-5.6-luna",
+            input=[
+                {
+                    "role": "system",
+                    "content": """
+                You are a car marketplace search assistant.
+
+                Extract the customer's car search requirements.
+
+                Available fields:
+
+                bra]nd
+                model
+                colour
+                min_price
+                max_price
+                fueltype
+                geartype
+                location
+                min_year
+                max_year
+
+                Rules:
+
+                1. If a value is not mentioned, return null.
+                2. Convert lakh/lakhs into Indian rupees.
+                3. For example, 10 lakhs = 1000000.
+                4. Do not invent values.
+                5. if Tata Motors return TATA, Hyundai motors return Hyundai".
+                """
+                },
+                {
+                    "role": "user",
+                    "content": query
+                }
+            ],
+            text_format = schemas.CarSearchFilters
+        )
+        print(response.output_parsed)
+        return response.output_parsed
+
 
 client = OpenAI(
     api_key= config.settings.api_key
 )
 
 
-@router.post("/api/rag/",response_model=schemas.RAGResponse)
-def rag_api(question: schemas.RAGRequest, getcurrent_user :dict = Depends(auth2.get_current_user)):
+@router.post("/api/rag/")
+def rag_api(question: schemas.RAGRequest, getcurrent_user :dict = Depends(auth2.get_current_user), db : Session = Depends(database.get_db)):
 
-    answer = RAG_simple(
-        query=question.query,
-        retriever=rag_retrieve,
-        client=client
-    )
+    intent_input = f"""
+                    You are a car marketplace assistant.
 
-    return {
-        "answer": answer
-    }
+                    Classify the user's request into exactly one intent:
+
+                    car_search:
+                    The user wants to find, filter, or search cars in the database.
+
+                    Examples:
+                    - I need Tata Motors cars under 5 lakhs
+                    - Show me automatic Hyundai cars
+                    - Find red cars in Chennai
+                    - Show me cars below 8 lakhs
+
+                    knowledge:
+                    The user is asking a general question that should be answered using the company's documents/knowledge base.
+
+                    Examples:
+                    - Is it better to lease or buy a new car?
+                    - What is the car purchasing procedure?
+                    - What documents are required?
+                    - What are the EMI options?
+
+
+                    question : {question.query}
+                    Return only the intent.
+"""
+
+    intent_response = client.responses.parse(
+    model="gpt-5.6-luna",
+    input=intent_input,
+    text_format=schemas.QueryIntent
+)
+
+    if intent_response == "knowledge":
+        answer = RAG_simple(
+            query=question.query,
+            retriever=rag_retrieve,
+            client=client
+        )
+        return {
+                "answer": answer
+            }
+
+    else:
+        filters = filtercars(
+            query=question.query,
+            
+            client=client
+                )
+
+        query = db.query(models.Car)
+        
+
+    if filters.brand:
+        query = query.join(models.Brand).filter(
+            models.Brand.brand.ilike(f"%{filters.brand}%")
+        )
+
+    if filters.model:
+        query = query.filter(
+            models.Car.model == filters.model
+        )
+
+    if filters.colour:
+        query = query.filter(
+            models.Car.colour == filters.colour
+        )
+
+    if filters.min_price is not None:
+        query = query.filter(
+            models.Car.price >= filters.min_price
+        )
+
+    if filters.max_price is not None:
+        query = query.filter(
+            models.Car.price <= filters.max_price
+        )
+
+    if filters.fueltype:
+        query = query.join(models.FuelType).filter(
+            models.FuelType.fueltype == filters.fueltype
+        )
+
+    if filters.geartype:
+        query = query.join(models.GearType).filter(
+            models.GearType.geartype == filters.geartype
+        )
+
+    if filters.location:
+        query = query.filter(
+            models.Car.carlocation.ilike(f"%{filters.location}%")
+        )
+
+    if filters.min_year is not None:
+        query = query.filter(
+            models.Car.year >= filters.min_year
+        )
+
+    if filters.max_year is not None:
+        query = query.filter(
+            models.Car.year <= filters.max_year
+        )
+
+    try:
+        cars = query.all()
+        for car in cars:
+            print(car,'\n\n')
+
+        
+
+        return {
+            "count": len(cars),
+            "cars": cars
+        }
+
+    except Exception as e:
+        print("ERROR:", repr(e))
+        raise
+
+        
+
+    

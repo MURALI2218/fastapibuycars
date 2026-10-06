@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./navbar.css";
 import { ACCESS_TOKEN } from '../constant';
+import  buycarslogo  from "../assets/BuyCars.png" 
 
 
 const Navbar = () => {
@@ -37,7 +38,7 @@ const Navbar = () => {
           {/* Brand Logo */}
           <h2 className="logo">
             <Link to="/" onClick={closeMenu}>
-              Buy Cars
+              <img className="buycarslogo" src={buycarslogo} alt="" />
             </Link>
           </h2>
 
@@ -47,7 +48,10 @@ const Navbar = () => {
               Home
             </Link>
             <Link className="nav-btn" to="/owncarslist">
-              Your Cars
+              Postedcars
+            </Link>
+            <Link className="nav-btn" to="/carbooking">
+              Bookedcars
             </Link>
             <Link className="nav-btn" to="/profile">
               Profile

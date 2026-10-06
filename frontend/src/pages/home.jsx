@@ -1,132 +1,82 @@
 import { useState, useEffect, filter } from "react";
 import api from  "../api";
 import Navbar from "./Navbar";
+import Chatbot from "./chatbot";
 import '../sytles/createcarform.css';
 import '../sytles/chatbot.css'
 import '../sytles/home.css'
-import { ArrowRight, HeartFill } from 'react-bootstrap-icons';
-import chatboticon from  '../assets/chatboticon.webp'; 
+import backgroundimage from '../assets/backgroundimages.png'
+
 
 function Home(){
     
 
     const [datafromapi, setDatas] = useState([]);
-const [error, setError] = useState(false);
+    const [error, setError] = useState(false);
 
-const [searchModel, setSearchModel] = useState("");
-const [selectedCity, setSelectedCity] = useState("");
-const [selectedFuel, setSelectedFuel] = useState("");
-const [selectedGear, setSelectedGear] = useState("");
-const [selectedBudget, setSelectedBudget] = useState("");
-const [selectedColour, setSelectedColour] = useState("");
-const [selectedYear, setSelectedYear] = useState("");
+    const [searchModel, setSearchModel] = useState("");
+    const [selectedBrand, setselectedBrand] = useState("")
+    const [selectedCity, setSelectedCity] = useState("");
+    const [selectedFuel, setSelectedFuel] = useState("");
+    const [selectedGear, setSelectedGear] = useState("");
+    const [selectedBudget, setSelectedBudget] = useState("");
+    const [selectedColour, setSelectedColour] = useState("");
+    const [selectedYear, setSelectedYear] = useState("");
 
-const [activeFilter, setActiveFilter] = useState(null);
-const [showAllFilters, setShowAllFilters] = useState(false);
-
-    const [inputchatbot, setchatbotinput] = useState("");
-
-const [chatMessages, setChatMessages] = useState([
-    {
-        sender: "bot",
-        message: "👋 Hi! I'm your Car Assistant."
-    },
-    {
-        sender: "bot",
-        message: "You can ask me about cars, prices, models, fuel type, location and more."
-    }
-]);
-
-const [chatLoading, setChatLoading] = useState(false);
-    const submitquerrytochatbor = async (e) => {
-    e.preventDefault();
-
-    const query = inputchatbot.trim();
-
-    // Don't send empty messages
-    if (!query) {
-        return;
-    }
-
-    // Immediately add user's message
-    setChatMessages((previousMessages) => [
-        ...previousMessages,
-        {
-            sender: "user",
-            message: query
-        }
-    ]);
-
-    // Clear input
-    setchatbotinput("");
-
-    setChatLoading(true);
-
-    try {
-
-        const formdata = {
-            query: query
-        };
-
-        const res = await api.post("/api/rag/", formdata);
-
-        // console.log("RAG RESPONSE:", res.data);
-
-        // Add bot response
-        setChatMessages((previousMessages) => [
-            ...previousMessages,
-            {
-                sender: "bot",
-                message: res.data.answer
-            }
-        ]);
-
-    } catch (error) {
-
-        console.log("RAG ERROR:", error.response?.data);
-
-        setChatMessages((previousMessages) => [
-            ...previousMessages,
-            {
-                sender: "bot",
-                message:
-                    error.response?.data?.detail ||
-                    "Sorry, something went wrong. Please try again."
-            }
-        ]);
-
-    } finally {
-        setChatLoading(false);
-    }
-};
-    
+    const [activeFilter, setActiveFilter] = useState(null)
 
    
     //Function For Fetching DATA from BACKEND
-    const fetchCars = () =>{
-                
-                    setTimeout( ()=> {
-                        api.get('/api/cars/')
-                            .then( (response) =>{return response.data})
-                            .then( (data) => {setDatas(data);})
-                            .catch( (error) => {console.log(error.message);setError(error.message);
-                            })
+            
+        const [loading, setLoading] = useState(true);
+
+        const fetchCars = () => {
+
+            setLoading(true);
+
+            setTimeout(() => {
+
+                api.get("/api/cars/")
+                    .then((response) => {
+                        setDatas(response.data);
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                        setError(error.message);
+                    })
+                    .finally(() => {
+                        setLoading(false);
                     });
-              
-                return [datafromapi, error]
-            }
-             //Call function for fetch CARS from database
-           useEffect(() => {
-                fetchCars();
-                }, []);
 
+            }, 1000);
+        };
 
-                //FLITERS
-                const filteredCars = datafromapi.filter((car) => {
+useEffect(() => {
+    fetchCars();
+}, []);
+    const clearfilters =() =>{
+              setselectedBrand("") 
+              setSelectedFuel("")
+              setSelectedGear("") 
+              setSelectedYear("")
+              setSelectedColour("")
+              setSelectedBudget("")
+    }
+    useEffect(() => {
+                clearfilters();
+                }, 1000);
+
+    //FLITERS
+    const filteredCars = datafromapi.filter((car) => {
 
     const modelMatch =
         searchModel === "" ||
         car.model.toLowerCase().includes(searchModel.toLowerCase());
+
+    const brandMatch =
+        selectedBrand === "" ||
+        car.brand?.brand.toLowerCase() === selectedBrand.toLowerCase();
+
 
     const cityMatch =
         selectedCity === "" ||
@@ -172,6 +122,7 @@ const [chatLoading, setChatLoading] = useState(false);
 
     return (
         modelMatch &&
+        brandMatch &&
         cityMatch &&
         fuelMatch &&
         gearMatch &&
@@ -180,8 +131,7 @@ const [chatLoading, setChatLoading] = useState(false);
         budgetMatch
     );
 });
-
- const [chatOpen,setChatbotOpen] = useState(true)
+ 
 
                return(
                 <>
@@ -213,6 +163,32 @@ const [chatLoading, setChatLoading] = useState(false);
             {/* FILTER BUTTONS */}
 
             <div className="filter-buttons">
+
+                 {/* BRANDS */}
+                    
+                     <div className="filter-wrapper">
+                       
+                        <select
+                            value={selectedBrand}
+                            onChange={(e) =>
+                                setselectedBrand(e.target.value)
+                            }
+                        >
+                            <option value="">All Brands</option>
+
+                            {[...new Set(
+                                datafromapi.map(car => car.brand.brand)
+                            )].map(brand => (
+                                <option
+                                    key={brand}
+                                    value={brand}
+                                >
+                                    {brand}
+                                </option>
+                            ))}
+
+                        </select>
+                            </div>
 
                 {/* BUDGET */}
 
@@ -279,115 +255,58 @@ const [chatLoading, setChatLoading] = useState(false);
 
                 </div>
 
+
                 {/* FUEL */}
+                    
+                     <div className="filter-wrapper">
+                       
+                        <select
+                            value={selectedFuel}
+                            onChange={(e) =>
+                                setSelectedFuel(e.target.value)
+                            }
+                        >
+                            <option value="">All Fuels</option>
 
-                <div className="filter-wrapper">
+                            {[...new Set(
+                                datafromapi.map(car => car.fueltype.fueltype)
+                            )].map(fueltype => (
+                                <option
+                                    key={fueltype}
+                                    value={fueltype}
+                                >
+                                    {fueltype}
+                                </option>
+                            ))}
 
-                    <button
-                        className="filter-button"
-                        onClick={() =>
-                            setActiveFilter(
-                                activeFilter === "fuel"
-                                    ? null
-                                    : "fuel"
-                            )
-                        }
-                    >
-                        <i className="bi bi-fuel-pump"></i>
-                        Fuel Type
-                    </button>
-
-                    {activeFilter === "fuel" && (
-                        <div className="filter-dropdown">
-
-                            <button onClick={() => {
-                                setSelectedFuel("");
-                                setActiveFilter(null);
-                            }}>
-                                All Fuel Types
-                            </button>
-
-                            <button onClick={() => {
-                                setSelectedFuel("Petrol");
-                                setActiveFilter(null);
-                            }}>
-                                Petrol
-                            </button>
-
-                            <button onClick={() => {
-                                setSelectedFuel("Diesel");
-                                setActiveFilter(null);
-                            }}>
-                                Diesel
-                            </button>
-
-                            <button onClick={() => {
-                                setSelectedFuel("Electric");
-                                setActiveFilter(null);
-                            }}>
-                                Electric
-                            </button>
-
-                            <button onClick={() => {
-                                setSelectedFuel("CNG");
-                                setActiveFilter(null);
-                            }}>
-                                CNG
-                            </button>
-
-                        </div>
-                    )}
-
-                </div>
-
+                        </select>
+                            </div>
 
                 {/* TRANSMISSION */}
 
-                <div className="filter-wrapper">
+                     <div className="filter-wrapper">
+                       
+                        <select
+                            value={selectedGear}
+                            onChange={(e) =>
+                                setSelectedGear(e.target.value)
+                            }
+                        >
+                            <option value=""> All Transmissions</option>
 
-                    <button
-                        className="filter-button"
-                        onClick={() =>
-                            setActiveFilter(
-                                activeFilter === "gear"
-                                    ? null
-                                    : "gear"
-                            )
-                        }
-                    >
-                        <i className="bi bi-gear"></i>
-                        Transmission
-                    </button>
+                            {[...new Set(
+                                datafromapi.map(car => car.geartype.geartype)
+                            )].map(geartype => (
+                                <option
+                                    key={geartype}
+                                    value={geartype}
+                                >
+                                    {geartype}
+                                </option>
+                            ))}
 
-                    {activeFilter === "gear" && (
-                        <div className="filter-dropdown">
-
-                            <button onClick={() => {
-                                setSelectedGear("");
-                                setActiveFilter(null);
-                            }}>
-                                All
-                            </button>
-
-                            <button onClick={() => {
-                                setSelectedGear("Manual");
-                                setActiveFilter(null);
-                            }}>
-                                Manual
-                            </button>
-
-                            <button onClick={() => {
-                                setSelectedGear("Automatic");
-                                setActiveFilter(null);
-                            }}>
-                                Automatic
-                            </button>
-
-                        </div>
-                    )}
-
-                </div>
-
+                        </select>
+                            </div>
                   
                      <div className="filter-wrapper">
                        
@@ -441,20 +360,33 @@ const [chatLoading, setChatLoading] = useState(false);
                         </select>
                     
                 </div>
+
+                <div>
+                    <button  className="clearfilters-button" onClick={()=>{clearfilters()}}>clear filters</button>
+                </div>
+
                      </div>    
                     </div>
 
                 </div>
 
               
+
+        
         {/* CARS */}
-
+        
         <div className="cars-section">
-
-            <h2 className="section-title">
+            {loading ? (
+    <div className="cars-loading">
+        <div className="spinner"></div>
+        <p>Loading cars...</p>
+    </div>
+        ) : (
+            <div>
+             <h2 className="section-title">
                 Cars
                 <span className="car-count">
-                    {filteredCars.length} cars
+                   total - {filteredCars.length} cars
                 </span>
             </h2>
 
@@ -531,113 +463,13 @@ const [chatLoading, setChatLoading] = useState(false);
 
             </div>
 
-        </div>
-  
-            
-            <div className="chatbot-container">
-
-    {chatOpen && (
-        <div className="chatbot-window">
-
-            {/* HEADER */}
-
-            <div className="chatbot-header">
-
-                <div>
-                    <h3>Car Assistant</h3>
-                    <span>●</span>
-                    <span> Online</span>
-                </div>
-
-                <button
-                    className="chatbot-close"
-                    onClick={() => setChatbotOpen(false)}
-                >
-                    ×
-                </button>
-
             </div>
-
-
-            {/* MESSAGES */}
-
-            <div className="chatbot-messages">
-
-                {chatMessages.map((chat, index) => (
-
-                    <div
-                        key={index}
-                        className={
-                            chat.sender === "user"
-                                ? "user-message"
-                                : "bot-message"
-                        }
-                    >
-                        {chat.message}
-                    </div>
-
-                ))}
-
-                {chatLoading && (
-                    <div className="bot-message typing-message">
-                        Thinking...
-                    </div>
                 )}
-
-            </div>
-
-
-            {/* INPUT */}
-
-            <div className="chatbot-input">
-
-                <form
-                    className="input-submit"
-                    onSubmit={submitquerrytochatbor}
-                >
-                    <div class="input-group">
-                        <input
-                            type="text"
-                            placeholder="Ask about cars..."
-                            value={inputchatbot}
-                            onChange={(e) =>
-                                setchatbotinput(e.target.value)
-                            }
-                            disabled={chatLoading}
-                        />
-                        <div>
-                            <button
-                            type="submit"
-                            disabled={
-                                chatLoading ||
-                                !inputchatbot.trim()
-                            }
-                        >
-                            <ArrowRight size={20} />
-                        </button>
-                        </div>
-                        
-                            
-                    </div>
-                </form>
-
-            </div>
-
         </div>
-    )}
 
-
-    {/* FLOATING BUTTON */}
-
-    <button
-        className="chatbot-button"
-        onClick={() => setChatbotOpen(!chatOpen)}
-    >
-        <img className="chatboticon" src={chatboticon} alt="" />
-    </button>
-
-</div>
-                
+  
+    <Chatbot></Chatbot>
+                     
 
     </>
                )

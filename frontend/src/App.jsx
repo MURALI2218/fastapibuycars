@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Profile from './pages/profile'
 import { ACCESS_TOKEN } from './constant';
 import { jwtDecode } from "jwt-decode";
+import Bookings from './pages/booking'
 const token = localStorage.getItem(ACCESS_TOKEN);
 if (token === String){
   const decoded = jwtDecode(token);
@@ -39,6 +40,7 @@ function App() {
         <Route path="*" element={<Notfound404></Notfound404>}></Route>
         <Route path='/owncarslist' element={<ProtectedRoute><Owncarslist/></ProtectedRoute>}></Route>
         <Route path="/profile"element={ <ProtectedRoute><Profile /> </ProtectedRoute>}/>
+        <Route path="/carbooking" element={ <ProtectedRoute><Bookings /></ProtectedRoute>}/>
        </Routes>
       </BrowserRouter>
 

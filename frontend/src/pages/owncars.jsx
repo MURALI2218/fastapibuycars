@@ -135,6 +135,7 @@ const [showDeletePopup, setShowDeletePopup] = useState(false)
         return(
                 <>
                 <Navbar></Navbar>
+                 <h1>You Posted Cars for Sale</h1>
                 {cardata.length>0 ? 
                 <div className="car-table-container">
                     <table className="car-table">

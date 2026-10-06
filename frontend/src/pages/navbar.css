@@ -2,7 +2,7 @@
 .header {
   background-color: #0d2857;
   color: #ffffff;
-  padding: 28px 24px;
+  padding: 10px 30px 5px 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   position: sticky;
   top: 0;
@@ -76,12 +76,12 @@
   color: #e2e8f0;
   text-decoration: none;
   font-size: 1.2rem;
-  font-weight: 500;
+  font-weight: 100;
   transition: color 0.2s ease;
 }
 
 .nav-btn:hover {
-  color: #0aff3b;
+  color: #ffc20a;
 }
 
 .primary-btn {
@@ -190,4 +190,9 @@
   .desktop-only {
     display: none;
   }
+}
+
+.buycarslogo{
+  width: 280px;
+  height: 60px;
 }
